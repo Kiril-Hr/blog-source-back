@@ -2,12 +2,12 @@ import PostModel from "../models/Post.js";
 
 export const getLastTags = async (req, res) => {
   try {
-    const posts = await PostModel.find().limit(5).exec();
+    const posts = await PostModel.find().limit(15).exec();
 
     const tags = posts
       .map((obj) => obj.tags)
       .flat()
-      .slice(0, 15);
+      .slice(0, 30);
 
     res.json(tags);
   } catch (err) {
@@ -21,6 +21,22 @@ export const getLastTags = async (req, res) => {
 export const getAll = async (req, res) => {
   try {
     const posts = await PostModel.find().populate("user").exec();
+    res.json(posts);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Failed to get posts",
+    });
+  }
+};
+
+export const getSortedPopularAll = async (req, res) => {
+  try {
+    const posts = await PostModel.find()
+      .limit(15)
+      .sort({ viewsCount: -1, createdAt: 1 })
+      .populate("user")
+      .exec();
     res.json(posts);
   } catch (err) {
     console.log(err);
