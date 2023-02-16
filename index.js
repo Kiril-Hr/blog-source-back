@@ -9,11 +9,16 @@ import {
   registerValidation,
   loginValidation,
   postCreateValidation,
+  commentCreateValidation,
 } from "./validations.js";
 
 import { handleValidationErrors, checkAuth } from "./utils/index.js";
 
-import { UserController, PostController } from "./controllers/index.js";
+import {
+  UserController,
+  PostController,
+  CommentController,
+} from "./controllers/index.js";
 
 mongoose
   .connect(
@@ -42,6 +47,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/uploads", express.static("uploads"));
 
+///////////////////////////////////////////////////// - auth
 app.post(
   "/auth/login",
   loginValidation,
@@ -55,19 +61,18 @@ app.post(
   UserController.register
 );
 app.get("/auth/me", checkAuth, UserController.getMe);
+/////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////// - upload files
 app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
   res.json({
     url: `/uploads/${req.file.originalname}`,
   });
 });
+/////////////////////////////////////////////////////
 
-app.get("/tags", PostController.getLastTags);
-
-app.get("/posts/popular", PostController.getSortedPopularAll);
-app.get("/posts", PostController.getAll);
-app.get("/posts/tags", PostController.getLastTags);
-app.get("/posts/:id", PostController.getOne);
+///////////////////////////////////////////////////// - posts, tags, comments
+////////////////////// - create
 app.post(
   "/posts",
   checkAuth,
@@ -75,7 +80,29 @@ app.post(
   handleValidationErrors,
   PostController.create
 );
-app.delete("/posts/:id", checkAuth, PostController.remove);
+
+/// - comments of post
+app.post(
+  "/posts/comments",
+  checkAuth,
+  commentCreateValidation,
+  handleValidationErrors,
+  CommentController.create
+);
+
+////////////////////// - read
+app.get("/posts", PostController.getAll);
+app.get("/posts/popular", PostController.getSortedPopularAll);
+app.get("/posts/:id", PostController.getOne);
+
+/// - tags of post
+app.get("/tags", PostController.getLastTags);
+
+/// - comments of post
+app.get("/comments", CommentController.getAll);
+app.get("/comments/:id", CommentController.getCommentsByPostId);
+
+////////////////////// - update
 app.patch(
   "/posts/:id",
   checkAuth,
@@ -84,6 +111,13 @@ app.patch(
   PostController.update
 );
 
+////////////////////// - delete
+app.delete("/posts/:id", checkAuth, PostController.remove);
+/////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////// - get requests from
 app.listen(process.env.PORT || 4444, (err) => {
   if (err) {
     return console.log(err);

@@ -24,3 +24,8 @@ export const postCreateValidation = [
     .isArray(),
   body("imageUrl", "Wrong url").optional().isString(),
 ];
+
+export const commentCreateValidation = [
+  body("postId", "Incorrect format of id").isString(),
+  body("text", "Field has not to be empty").isLength({ min: 1 }).isString(),
+];
