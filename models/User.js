@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -15,11 +15,15 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    postsCount: {
+      type: Number,
+      default: 0,
+    },
     avatarUrl: String,
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-export default mongoose.model('User', UserSchema);
+export default mongoose.model("User", UserSchema);

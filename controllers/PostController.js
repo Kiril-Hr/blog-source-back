@@ -1,16 +1,38 @@
 import PostModel from "../models/Post.js";
+import UserModel from "../models/User.js";
 
 ///////////////////////// - create
 
 export const create = async (req, res) => {
   try {
+    const user = req.userId;
     const doc = new PostModel({
       title: req.body.title,
       text: req.body.text,
       imageUrl: req.body.imageUrl,
       tags: req.body.tags,
-      user: req.userId,
+      user,
     });
+
+    UserModel.findOneAndUpdate(
+      {
+        _id: user,
+      },
+      {
+        $inc: { postsCount: 1 },
+      },
+      {
+        returnDocument: "after",
+      },
+      (err) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({
+            message: "Failed to increase count",
+          });
+        }
+      }
+    );
 
     const post = await doc.save();
 
