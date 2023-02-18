@@ -107,3 +107,16 @@ export const getMe = async (req, res) => {
     });
   }
 };
+
+export const getAllBlogs = async (req, res) => {
+  try {
+    const blogs = await UserModel.find({ postsCount: { $gt: 0 } }).exec();
+
+    res.json(blogs);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Failed to get list of blogs",
+    });
+  }
+};

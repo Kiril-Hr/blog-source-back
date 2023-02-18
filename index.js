@@ -61,6 +61,7 @@ app.post(
   UserController.register
 );
 app.get("/auth/me", checkAuth, UserController.getMe);
+app.get("/blogs", checkAuth, UserController.getAllBlogs);
 
 /////////////////////////////////////////////////////
 
