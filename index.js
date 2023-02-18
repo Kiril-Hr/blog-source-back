@@ -100,6 +100,7 @@ app.get("/tags", PostController.getLastTags);
 
 /// - comments of post
 app.get("/comments", CommentController.getAll);
+app.get("/comments/groupById", CommentController.getCommentsGroupsSortedById);
 app.get("/comments/:id", CommentController.getCommentsByPostId);
 
 ////////////////////// - update
@@ -113,8 +114,6 @@ app.patch(
 
 ////////////////////// - delete
 app.delete("/posts/:id", checkAuth, PostController.remove);
-/////////////////////////////////////////////////////
-
 /////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////// - get requests from
