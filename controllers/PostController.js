@@ -1,6 +1,13 @@
 import PostModel from "../models/Post.js";
 import UserModel from "../models/User.js";
 
+import { fileURLToPath } from "url";
+import path from "path";
+import fs from "fs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 ///////////////////////// - create
 
 export const create = async (req, res) => {
@@ -79,6 +86,27 @@ export const getOne = async (req, res) => {
   try {
     const postId = req.params.id;
 
+    const thisPost = await PostModel.findById(postId);
+
+    const userId = thisPost.user._id;
+
+    UserModel.findOneAndUpdate(
+      {
+        _id: userId,
+      },
+      {
+        $inc: { totalViewsCount: 1 },
+      },
+      (err) => {
+        if (err) {
+          console.warn(err);
+          return res.status(500).json({
+            message: "Failed to get user or increase views",
+          });
+        }
+      }
+    );
+
     PostModel.findOneAndUpdate(
       {
         _id: postId,
@@ -132,11 +160,35 @@ export const getLastTags = async (req, res) => {
   }
 };
 
+export const getPostsByUserId = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const posts = await PostModel.find({
+      user: userId,
+    }).exec();
+
+    res.json(posts);
+  } catch (err) {
+    console.warn(err);
+    res.status(500).json({
+      message: "Failed to get user posts",
+    });
+  }
+};
+
 ///////////////////////// - update
 
 export const update = async (req, res) => {
   try {
     const postId = req.params.id;
+
+    const post = await PostModel.findById(postId);
+
+    if (post.imageUrl) {
+      const filePath = path.join(__dirname, "..", post.imageUrl);
+      fs.unlinkSync(filePath);
+    }
 
     await PostModel.updateOne(
       {
@@ -167,6 +219,24 @@ export const update = async (req, res) => {
 export const remove = async (req, res) => {
   try {
     const postId = req.params.id;
+    const userId = req.params.userId;
+
+    UserModel.findByIdAndUpdate(
+      {
+        _id: userId,
+      },
+      {
+        $inc: { postsCount: -1 },
+      },
+      (err) => {
+        if (err) {
+          console.warn(err);
+          return res.status(500).json({
+            message: "Failed to decrease count",
+          });
+        }
+      }
+    );
 
     PostModel.findOneAndDelete(
       {

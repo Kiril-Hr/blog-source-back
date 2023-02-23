@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    totalViewsCount: {
+      type: Number,
+      default: 0,
+    },
     avatarUrl: String,
   },
   {

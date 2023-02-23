@@ -29,19 +29,32 @@ mongoose
 
 const app = express();
 
-const storage = multer.diskStorage({
+const postStorage = multer.diskStorage({
   destination: (_, __, cb) => {
-    if (!fs.existsSync("uploads")) {
-      fs.mkdirSync("uploads");
+    if (!fs.existsSync("uploads/post")) {
+      fs.mkdirSync("uploads/post");
     }
-    cb(null, "uploads");
+    cb(null, "uploads/post");
   },
   filename: (_, file, cb) => {
     cb(null, file.originalname);
   },
 });
 
-const upload = multer({ storage });
+const userStorage = multer.diskStorage({
+  destination: (_, __, cb) => {
+    if (!fs.existsSync("uploads/user")) {
+      fs.mkdirSync("uploads/user");
+    }
+    cb(null, "uploads/user");
+  },
+  filename: (_, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const postUpload = multer({ storage: postStorage });
+const userUpload = multer({ storage: userStorage });
 
 app.use(express.json());
 app.use(cors());
@@ -62,15 +75,23 @@ app.post(
 );
 app.get("/auth/me", checkAuth, UserController.getMe);
 app.get("/blogs", checkAuth, UserController.getAllBlogs);
+app.get("/user/:id", UserController.getOneUser);
 
 /////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////// - upload files
-app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
+app.post("/uploads/post", checkAuth, postUpload.single("image"), (req, res) => {
   res.json({
-    url: `/uploads/${req.file.originalname}`,
+    url: `/uploads/post/${req.file.originalname}`,
   });
 });
+
+app.patch(
+  "/avatar-update/:id",
+  checkAuth,
+  userUpload.single("image"),
+  UserController.uploadAvatar
+);
 /////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////// - posts, tags, comments
@@ -96,6 +117,7 @@ app.post(
 app.get("/posts", PostController.getAll);
 app.get("/posts/popular", PostController.getSortedPopularAll);
 app.get("/posts/:id", PostController.getOne);
+app.get("/posts/user/:id", PostController.getPostsByUserId);
 
 /// - tags of post
 app.get("/tags", PostController.getLastTags);
@@ -115,7 +137,8 @@ app.patch(
 );
 
 ////////////////////// - delete
-app.delete("/posts/:id", checkAuth, PostController.remove);
+app.delete("/posts/:id/:userId", checkAuth, PostController.remove);
+app.delete("/comments/:id/:postId", checkAuth, CommentController.removeComment);
 /////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////// - get requests from

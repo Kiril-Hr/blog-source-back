@@ -14,6 +14,7 @@ const PostSchema = new mongoose.Schema(
     tags: {
       type: Array,
       default: [],
+      unique: false,
     },
     viewsCount: {
       type: Number,

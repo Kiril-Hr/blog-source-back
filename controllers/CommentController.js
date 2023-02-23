@@ -17,24 +17,24 @@ export const create = async (req, res) => {
         _id: postId,
       },
       {
-        $inc: { commentsCount: 1 },
+        $inc: { commentsCount: Number(1) },
       },
       {
         returnDocument: "after",
       },
-      (err) => {
+      async (err) => {
         if (err) {
           console.log(err);
           return res.status(500).json({
             message: "Failed to increase count",
           });
         }
+
+        const comment = await doc.save();
+
+        res.json(comment);
       }
     );
-
-    const comment = await doc.save();
-
-    res.json(comment);
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -86,6 +86,65 @@ export const getCommentsGroupsSortedById = async (req, res) => {
     console.log(err);
     res.status(500).json({
       message: "Failed to get comments",
+    });
+  }
+};
+
+//////////////////////// - update
+
+// - soon :)
+
+//////////////////////// - delete
+
+export const removeComment = async (req, res) => {
+  try {
+    const commentId = req.params.id;
+    const postId = req.params.postId;
+
+    PostModel.findByIdAndUpdate(
+      {
+        _id: postId,
+      },
+      {
+        $inc: { commentsCount: -1 },
+      },
+      (err) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({
+            message: "Failed to decrease count",
+          });
+        }
+      }
+    );
+
+    CommentModel.findOneAndDelete(
+      {
+        _id: commentId,
+      },
+      (err, doc) => {
+        if (err) {
+          console.warn(err);
+          return res.status(500).json({
+            message: "Failed to delete comment",
+          });
+        }
+
+        if (!doc) {
+          return res.status(404).json({
+            message: "Failed to find comment",
+          });
+        }
+
+        res.json({
+          success: true,
+        });
+      }
+    );
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Failed to delete comment",
     });
   }
 };
