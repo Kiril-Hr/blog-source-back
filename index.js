@@ -1,9 +1,16 @@
 import express from "express";
-import fs from "fs";
+
 import multer from "multer";
 import cors from "cors";
 
 import mongoose from "mongoose";
+
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import {
   registerValidation,
@@ -92,6 +99,25 @@ app.patch(
   userUpload.single("image"),
   UserController.uploadAvatar
 );
+
+app.delete("/image-delete/:directory/:filename", (req, res) => {
+  const filename = req.params.filename;
+  const directory = req.params.directory;
+
+  const filePath = path.join(__dirname, `uploads/${directory}`, filename);
+
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({
+        message: "Failed to delete file",
+      });
+    }
+  });
+  return res.send({
+    message: "File deleted successfully",
+  });
+});
 /////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////// - posts, tags, comments
