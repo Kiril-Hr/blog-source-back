@@ -221,6 +221,19 @@ export const remove = async (req, res) => {
     const postId = req.params.id;
     const userId = req.params.userId;
 
+    const post = await PostModel.find({ _id: postId });
+    const { imageUrl } = post[0];
+    const filename = imageUrl.slice(14);
+
+    if (imageUrl) {
+      const filePath = path.join(__dirname, "../uploads/post", filename);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
+
     UserModel.findByIdAndUpdate(
       {
         _id: userId,
