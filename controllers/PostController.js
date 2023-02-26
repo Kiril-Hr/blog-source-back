@@ -66,6 +66,28 @@ export const getAll = async (req, res) => {
   }
 };
 
+export const getPortion = async (req, res) => {
+  const page = parseInt(req.query.page);
+  const limit = parseInt(req.query.limit);
+
+  try {
+    const posts = await PostModel.find()
+      .populate("user")
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
+    res.json({
+      posts,
+      informData: { currentPage: page, hasMore: posts.length === limit },
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Failed to get posts",
+    });
+  }
+};
+
 export const getSortedPopularAll = async (req, res) => {
   try {
     const posts = await PostModel.find()
@@ -183,11 +205,15 @@ export const update = async (req, res) => {
   try {
     const postId = req.params.id;
 
-    const post = await PostModel.findById(postId);
+    const { imageUrl } = await PostModel.findById(postId);
 
-    if (post.imageUrl) {
-      const filePath = path.join(__dirname, "..", post.imageUrl);
-      fs.unlinkSync(filePath);
+    if (imageUrl) {
+      const filePath = path.join(__dirname, "..", imageUrl);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      } else {
+        console.log("File delete (update post)");
+      }
     }
 
     await PostModel.updateOne(
@@ -221,17 +247,20 @@ export const remove = async (req, res) => {
     const postId = req.params.id;
     const userId = req.params.userId;
 
-    const post = await PostModel.find({ _id: postId });
-    const { imageUrl } = post[0];
+    const { imageUrl } = await PostModel.findById(postId);
     const filename = imageUrl.slice(14);
 
     if (imageUrl) {
       const filePath = path.join(__dirname, "../uploads/post", filename);
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.log(err);
-        }
-      });
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath, (err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+      } else {
+        console.log("File delete (remove post)");
+      }
     }
 
     UserModel.findByIdAndUpdate(

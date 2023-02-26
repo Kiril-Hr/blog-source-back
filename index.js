@@ -106,14 +106,17 @@ app.delete("/image-delete/:directory/:filename", (req, res) => {
 
   const filePath = path.join(__dirname, `uploads/${directory}`, filename);
 
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({
-        message: "Failed to delete file",
-      });
-    }
-  });
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath, (err) => {
+      if (err) {
+        return console.log(err);
+      }
+    });
+  } else {
+    return console.log(
+      "File deleted (changing file when create or update post)"
+    );
+  }
   return res.send({
     message: "File deleted successfully",
   });
@@ -141,6 +144,7 @@ app.post(
 
 ////////////////////// - read
 app.get("/posts", PostController.getAll);
+app.get("/posts/portion", PostController.getPortion);
 app.get("/posts/popular", PostController.getSortedPopularAll);
 app.get("/posts/:id", PostController.getOne);
 app.get("/posts/user/:id", PostController.getPostsByUserId);
