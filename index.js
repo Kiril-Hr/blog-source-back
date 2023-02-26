@@ -62,7 +62,11 @@ const postUpload = multer({ storage: postStorage });
 const userUpload = multer({ storage: userStorage });
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://blog-source-kxvrz5kyx-kiril-hr.vercel.app/",
+  })
+);
 app.use("/uploads", express.static("uploads"));
 
 ///////////////////////////////////////////////////// - auth
