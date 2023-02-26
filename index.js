@@ -28,7 +28,7 @@ import {
 } from "./controllers/index.js";
 
 mongoose
-  .connect(process.env.MONGODB_URL)
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log("DB ok"))
   .catch((err) => console.log("DB error", err));
 
@@ -62,23 +62,23 @@ const postUpload = multer({ storage: postStorage });
 const userUpload = multer({ storage: userStorage });
 
 app.use(express.json());
-// app.use(
-//   cors({
-//     origin: "https://blog-source-kxvrz5kyx-kiril-hr.vercel.app/",
-//   })
-// );
-app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
-  next();
-});
+app.use(
+  cors({
+    origin: "https://blog-source-kxvrz5kyx-kiril-hr.vercel.app/",
+  })
+);
+// app.use(function (req, res, next) {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader(
+//     "Access-Control-Allow-Methods",
+//     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+//   );
+//   res.setHeader(
+//     "Access-Control-Allow-Headers",
+//     "X-Requested-With,content-type"
+//   );
+//   next();
+// });
 app.use("/uploads", express.static("uploads"));
 
 ///////////////////////////////////////////////////// - auth
