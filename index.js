@@ -1,4 +1,5 @@
 import express from "express";
+import dotenv from "dotenv";
 
 import multer from "multer";
 import cors from "cors";
@@ -11,6 +12,10 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config();
+}
 
 import {
   registerValidation,
@@ -27,12 +32,21 @@ import {
   CommentController,
 } from "./controllers/index.js";
 
-mongoose
-  .connect(
-    "mongodb+srv://admin:wwwwww@cluster0.jqssztq.mongodb.net/blog?retryWrites=true&w=majority"
-  )
-  .then(() => console.log("DB ok"))
-  .catch((err) => console.log("DB error", err));
+mongoose.connect(
+  process.env.MONGODB_URI,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  },
+  (err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("Connected to MongoDB");
+      console.log("DB ok");
+    }
+  }
+);
 
 const app = express();
 
