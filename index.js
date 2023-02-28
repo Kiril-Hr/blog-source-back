@@ -1,5 +1,4 @@
 import express from "express";
-import dotenv from "dotenv";
 
 import multer from "multer";
 import cors from "cors";
@@ -16,7 +15,7 @@ const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 4444;
 
 if (process.env.NODE_ENV !== "production") {
-  dotenv.config();
+  require("dotenv").config();
 }
 
 import {
