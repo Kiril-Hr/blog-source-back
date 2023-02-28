@@ -35,7 +35,7 @@ import {
 } from "./controllers/index.js";
 
 mongoose.connect(
-  "mongodb+srv://admin:wwwwww@cluster0.jqssztq.mongodb.net/?retryWrites=true&w=majority",
+  process.env.MONGODB_URI,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
