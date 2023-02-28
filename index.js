@@ -13,6 +13,8 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const PORT = process.env.PORT || 4444;
+
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
@@ -187,7 +189,7 @@ app.delete("/comments/:id/:postId", checkAuth, CommentController.removeComment);
 /////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////// - get requests from
-app.listen(process.env.PORT || 4444, (err) => {
+app.listen(PORT, (err) => {
   if (err) {
     return console.log(err);
   }
