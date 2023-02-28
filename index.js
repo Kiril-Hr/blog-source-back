@@ -84,6 +84,10 @@ app.use(cors());
 app.use("/uploads", express.static("uploads"));
 
 ///////////////////////////////////////////////////// - auth
+app.get("/", (req, res) => {
+  res.send("Main page");
+});
+
 app.post(
   "/auth/login",
   loginValidation,
