@@ -155,7 +155,11 @@ export const uploadAvatar = async (req, res) => {
 
     if (user.avatarUrl) {
       const filePath = path.join(__dirname, "..", user.avatarUrl);
-      fs.unlinkSync(filePath);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      } else {
+        console.log("File delete (update user)");
+      }
     }
 
     user.avatarUrl = avatarUrl;
