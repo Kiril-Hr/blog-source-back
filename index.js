@@ -148,10 +148,17 @@ app.delete("/image-delete/:directory/:filename", (req, res) => {
 ////////////////////// - create
 app.post(
   "/posts",
-  checkAuth,
   postCreateValidation,
   handleValidationErrors,
   PostController.create
+);
+
+app.post(
+  "/posts/check",
+  checkAuth,
+  postCreateValidation,
+  handleValidationErrors,
+  PostController.createCheck
 );
 
 /// - comments of post
@@ -165,10 +172,17 @@ app.post(
 
 ////////////////////// - read
 app.get("/posts", PostController.getAll);
+app.get("/posts/check/all", PostController.getAllCheck);
 app.get("/posts/portion", PostController.getPortion);
 app.get("/posts/popular", PostController.getSortedPopularAll);
 app.get("/posts/:id", PostController.getOne);
+app.get("/posts/check/:id", PostController.getOneCheck);
 app.get("/posts/user/:id", PostController.getPostsByUserId);
+app.get(
+  "/posts/check/user-posts/:id",
+  checkAuth,
+  PostController.getCheckPostsByUserId
+);
 
 /// - tags of post
 app.get("/tags", PostController.getLastTags);
@@ -186,10 +200,16 @@ app.patch(
   handleValidationErrors,
   PostController.update
 );
-
+app.patch(
+  "/posts/check/edit/:id",
+  postCreateValidation,
+  handleValidationErrors,
+  PostController.updateCheck
+); // checkAuth
 ////////////////////// - delete
 app.delete("/posts/:id/:userId", checkAuth, PostController.remove);
 app.delete("/comments/:id/:postId", checkAuth, CommentController.removeComment);
+app.delete("/posts/check/remove/:id", PostController.removeCheck); // checkAuth
 /////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////// - get requests from
