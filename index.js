@@ -26,7 +26,11 @@ import {
   commentCreateValidation,
 } from "./validations.js";
 
-import { handleValidationErrors, checkAuth } from "./utils/index.js";
+import {
+  handleValidationErrors,
+  checkAuth,
+  checkAdminQuery,
+} from "./utils/index.js";
 
 import {
   UserController,
@@ -96,6 +100,13 @@ app.post(
   UserController.login
 );
 app.post(
+  "/auth-admin",
+  checkAdminQuery,
+  loginValidation,
+  handleValidationErrors,
+  UserController.login
+);
+app.post(
   "/auth/register",
   registerValidation,
   handleValidationErrors,
@@ -148,6 +159,7 @@ app.delete("/image-delete/:directory/:filename", (req, res) => {
 ////////////////////// - create
 app.post(
   "/posts",
+  checkAuth,
   postCreateValidation,
   handleValidationErrors,
   PostController.create
@@ -202,6 +214,7 @@ app.patch(
 );
 app.patch(
   "/posts/check/edit/:id",
+  checkAuth,
   postCreateValidation,
   handleValidationErrors,
   PostController.updateCheck
@@ -209,7 +222,7 @@ app.patch(
 ////////////////////// - delete
 app.delete("/posts/:id/:userId", checkAuth, PostController.remove);
 app.delete("/comments/:id/:postId", checkAuth, CommentController.removeComment);
-app.delete("/posts/check/remove/:id", PostController.removeCheck); // checkAuth
+app.delete("/posts/check/remove/:id", checkAuth, PostController.removeCheck);
 /////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////// - get requests from

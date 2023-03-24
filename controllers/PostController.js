@@ -1,6 +1,7 @@
 import PostModel from "../models/Post.js";
 import PostCheckModel from "../models/PostCheck.js";
 import UserModel from "../models/User.js";
+import CommentModel from "../models/Comment.js";
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -394,6 +395,8 @@ export const remove = async (req, res) => {
         }
       }
     );
+
+    CommentModel.find({ postId }).deleteMany();
 
     PostModel.findOneAndDelete(
       {
